@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -347,7 +347,8 @@
     border: 1px solid var(--glass-border); color: var(--text-muted);
     background: rgba(255,255,255,0.03);
   }
-/* PORTFOLIO */
+
+  /* PORTFOLIO */
   #portfolio { background: linear-gradient(180deg, transparent, rgba(0,87,255,0.03), transparent); }
   .portfolio-filter { display: flex; gap: 0.75rem; margin-top: 3rem; flex-wrap: wrap; }
   .filter-btn {
@@ -385,6 +386,66 @@
   .portfolio-desc { font-size: 0.78rem; color: var(--text-dim); margin-top: 0.5rem; line-height: 1.6; }
   .portfolio-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 1rem; }
   .ptag { padding: 0.2rem 0.55rem; border-radius: 4px; font-size: 0.65rem; background: rgba(255,255,255,0.05); color: var(--text-muted); }
+  .card-view-hint { margin-top: 1rem; font-size: 0.72rem; color: var(--red); letter-spacing: 0.04em; opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
+  .clickable-card:hover .card-view-hint { opacity: 1; transform: none; }
+  .clickable-card { cursor: pointer; }
+
+  /* PROJECT MODAL */
+  .project-modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(5,5,10,0.85); backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem;
+    opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+  }
+  .project-modal-overlay.open { opacity: 1; pointer-events: all; }
+  .project-modal {
+    max-width: 720px; width: 100%;
+    background: rgba(15,15,26,0.98);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; overflow: hidden;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 60px rgba(197,3,55,0.08);
+    transform: translateY(30px) scale(0.97); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+  }
+  .project-modal-overlay.open .project-modal { transform: none; }
+  .modal-hero {
+    height: 220px; display: flex; align-items: center; justify-content: center;
+    font-size: 5rem; position: relative; overflow: hidden;
+  }
+  .modal-hero::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 30%, rgba(15,15,26,0.98));
+  }
+  .modal-hero.mh-red { background: linear-gradient(135deg, rgba(197,3,55,0.35), rgba(197,3,55,0.05)); }
+  .modal-hero.mh-violet { background: linear-gradient(135deg, rgba(124,58,237,0.35), rgba(124,58,237,0.05)); }
+  .modal-body { padding: 2.5rem; }
+  .modal-badge {
+    display: inline-block; padding: 0.3rem 0.9rem; border-radius: 100px;
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--red-soft); border: 1px solid rgba(197,3,55,0.25); color: var(--red);
+    margin-bottom: 1rem;
+  }
+  .modal-title {
+    font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+    line-height: 1.1; letter-spacing: -0.02em;
+  }
+  .modal-desc { margin-top: 1rem; color: var(--text-dim); font-size: 0.95rem; line-height: 1.8; }
+  .modal-meta { display: flex; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  .modal-meta-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.3rem; }
+  .modal-meta-val { font-size: 0.85rem; color: var(--text); font-weight: 500; }
+  .modal-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
+  .modal-tag { padding: 0.3rem 0.8rem; border-radius: 100px; font-size: 0.72rem; border: 1px solid var(--glass-border); color: var(--text-dim); background: var(--glass); }
+  .modal-actions { display: flex; gap: 1rem; margin-top: 2rem; }
+  .modal-close-btn {
+    position: absolute; top: 1rem; right: 1rem; z-index: 10;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+    color: var(--text-dim); font-size: 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.3s, color 0.3s;
+  }
+  .modal-close-btn:hover { background: var(--red); color: #fff; border-color: var(--red); }
 
   /* ONGOING PROJECTS */
   #ongoing { background: radial-gradient(ellipse 80% 60% at 80% 50%, rgba(197,3,55,0.05), transparent); }
@@ -657,6 +718,7 @@
   <a href="#services" onclick="toggleMobileNav()">Services</a>
   <a href="#contact" onclick="toggleMobileNav()">Contact</a>
 </div>
+
 <!-- ==================== HERO ==================== -->
 <section id="hero">
   <div class="orb orb-1"></div>
@@ -836,15 +898,16 @@
       <button class="filter-btn" onclick="filterPortfolio('video', this)">Video</button>
     </div>
     <div class="portfolio-grid" id="portfolioGrid">
-      <div class="portfolio-card reveal" data-cat="web">
-        <div class="portfolio-thumb pt-red">🛒</div>
+      <div class="portfolio-card reveal clickable-card" data-cat="web" onclick="openProjectModal('v2')">
+        <div class="portfolio-thumb pt-red">🌐</div>
         <div class="portfolio-content">
-          <div class="portfolio-type">Web Development</div>
-          <div class="portfolio-title">E-Commerce Platform</div>
-          <div class="portfolio-desc">A full-featured online store with cart, payments, and admin dashboard.</div>
+          <div class="portfolio-type">Web Development · Freelance Template</div>
+          <div class="portfolio-title">Premium Portfolio V2.0</div>
+          <div class="portfolio-desc">A sleek, modern freelancer portfolio template with glassmorphism UI, animated sections, and full responsive layout built for professionals.</div>
           <div class="portfolio-tags">
-            <span class="ptag">React</span><span class="ptag">Node.js</span><span class="ptag">MongoDB</span>
+            <span class="ptag">HTML</span><span class="ptag">CSS</span><span class="ptag">JavaScript</span><span class="ptag">Glassmorphism</span>
           </div>
+          <div class="card-view-hint">Click to view details →</div>
         </div>
       </div>
       <div class="portfolio-card reveal reveal-delay-1" data-cat="design">
@@ -858,15 +921,16 @@
           </div>
         </div>
       </div>
-      <div class="portfolio-card reveal reveal-delay-2" data-cat="web">
-        <div class="portfolio-thumb pt-violet">🏢</div>
+      <div class="portfolio-card reveal reveal-delay-2 clickable-card" data-cat="web" onclick="openProjectModal('v1')">
+        <div class="portfolio-thumb pt-violet">💼</div>
         <div class="portfolio-content">
-          <div class="portfolio-type">Web Development</div>
-          <div class="portfolio-title">Corporate Website</div>
-          <div class="portfolio-desc">Multi-page responsive corporate site with CMS integration.</div>
+          <div class="portfolio-type">Web Development · Personal Portfolio</div>
+          <div class="portfolio-title">Portfolio V1.0</div>
+          <div class="portfolio-desc">My first personal portfolio website — a clean, minimal showcase of skills, projects, and contact info built from scratch with pure HTML, CSS & JS.</div>
           <div class="portfolio-tags">
-            <span class="ptag">Next.js</span><span class="ptag">WordPress</span>
+            <span class="ptag">HTML</span><span class="ptag">CSS</span><span class="ptag">JavaScript</span><span class="ptag">Responsive</span>
           </div>
+          <div class="card-view-hint">Click to view details →</div>
         </div>
       </div>
       <div class="portfolio-card reveal" data-cat="video">
@@ -1175,6 +1239,22 @@
   </div>
 </section>
 
+<!-- ==================== PROJECT MODAL ==================== -->
+<div class="project-modal-overlay" id="projectModalOverlay" onclick="closeModalOnOverlay(event)">
+  <div class="project-modal" id="projectModal">
+    <button class="modal-close-btn" onclick="closeProjectModal()">✕</button>
+    <div class="modal-hero" id="modalHero"><span id="modalEmoji"></span></div>
+    <div class="modal-body">
+      <div class="modal-badge" id="modalBadge"></div>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="modal-meta" id="modalMeta"></div>
+      <div class="modal-tags" id="modalTags"></div>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== FOOTER ==================== -->
 <footer>
   <div class="footer-inner">
@@ -1232,7 +1312,7 @@
     <div class="footer-divider"></div>
     <div class="footer-bottom">
       <div class="footer-copy">© 2025 <a href="#hero">Nangku Tayeng</a>. All rights reserved.</div>
-      <div class="footer-love">Made by <span>♥</span> Nangku Tayeng</div>
+      <div class="footer-love">Made with <span>♥</span> in India</div>
     </div>
   </div>
 </footer>
@@ -1303,6 +1383,75 @@
       btn.style.boxShadow = '';
     }, 3000);
   }
+
+  // Project modal data
+  const projects = {
+    v2: {
+      emoji: '🌐',
+      heroClass: 'mh-red',
+      badge: 'Web Development · Freelance Template',
+      title: 'Premium Portfolio V2.0',
+      desc: 'A fully responsive freelancer portfolio template crafted with glassmorphism aesthetics, smooth animations, and a clean modern layout. Designed to help creative professionals showcase their work, skills, and services in a stunning, professional manner. Built entirely with HTML, CSS, and vanilla JavaScript — no frameworks, no dependencies.',
+      meta: [
+        { label: 'Type', val: 'Freelance Template' },
+        { label: 'Stack', val: 'HTML / CSS / JS' },
+        { label: 'Theme', val: 'Glassmorphism' },
+        { label: 'Status', val: '✅ Live' },
+      ],
+      tags: ['HTML5', 'CSS3', 'JavaScript', 'Glassmorphism', 'Responsive', 'Animations'],
+      liveUrl: 'https://nangkutayeng.github.io/freelancer-template/',
+    },
+    v1: {
+      emoji: '💼',
+      heroClass: 'mh-violet',
+      badge: 'Web Development · Personal Portfolio',
+      title: 'Portfolio V1.0',
+      desc: 'My first personal portfolio website — a clean, minimal, and fully responsive web presence built from the ground up using pure HTML, CSS, and JavaScript. It serves as an introduction to my background, skills, and projects, with a simple layout that puts content front and center. A milestone project that marks the beginning of my freelance journey.',
+      meta: [
+        { label: 'Type', val: 'Personal Portfolio' },
+        { label: 'Stack', val: 'HTML / CSS / JS' },
+        { label: 'Theme', val: 'Minimal / Clean' },
+        { label: 'Status', val: '✅ Live' },
+      ],
+      tags: ['HTML5', 'CSS3', 'JavaScript', 'Responsive', 'Minimal Design'],
+      liveUrl: 'https://nangkutayeng.github.io/portfolio/',
+    }
+  };
+
+  function openProjectModal(id) {
+    const p = projects[id];
+    if (!p) return;
+    document.getElementById('modalEmoji').textContent = p.emoji;
+    document.getElementById('modalHero').className = 'modal-hero ' + p.heroClass;
+    document.getElementById('modalBadge').textContent = p.badge;
+    document.getElementById('modalTitle').textContent = p.title;
+    document.getElementById('modalDesc').textContent = p.desc;
+    document.getElementById('modalMeta').innerHTML = p.meta.map(m =>
+      `<div><div class="modal-meta-label">${m.label}</div><div class="modal-meta-val">${m.val}</div></div>`
+    ).join('');
+    document.getElementById('modalTags').innerHTML = p.tags.map(t =>
+      `<span class="modal-tag">${t}</span>`
+    ).join('');
+    document.getElementById('modalActions').innerHTML = `
+      <a href="${p.liveUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="display:inline-flex;align-items:center;gap:0.5rem;">
+        View Live <span style="font-size:0.85rem;">↗</span>
+      </a>
+      <button class="btn-ghost" onclick="closeProjectModal()">← Back</button>
+    `;
+    document.getElementById('projectModalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeProjectModal() {
+    document.getElementById('projectModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOnOverlay(e) {
+    if (e.target === document.getElementById('projectModalOverlay')) closeProjectModal();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProjectModal(); });
 </script>
 </body>
 </html>
